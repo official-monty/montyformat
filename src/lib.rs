@@ -1,6 +1,8 @@
 pub mod chess;
+mod format;
 
-#[macro_export]
+pub use format::{MontyFormat, SearchData};
+
 macro_rules! init {
     (|$sq:ident, $size:literal | $($rest:tt)+) => {{
         let mut $sq = 0;
@@ -13,7 +15,6 @@ macro_rules! init {
     }};
 }
 
-#[macro_export]
 macro_rules! bitloop {
     (| $bb:expr, $sq:ident | $func:expr) => {{
         let mut bb = $bb;
@@ -26,3 +27,6 @@ macro_rules! bitloop {
         }
     };}
 }
+
+pub(crate) use init;
+pub(crate) use bitloop;
