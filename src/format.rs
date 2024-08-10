@@ -90,7 +90,7 @@ impl MontyFormat {
             if let Some(dist) = data.visit_distribution.as_ref() {
                 let max_visits = dist.iter().max_by_key(|(_, visits)| visits).map(|x| x.1).unwrap_or(0);
                 for (_, visits) in dist {
-                    let scaled_visits = (*visits as f32 * 256.0 / max_visits as f32) as u16;
+                    let scaled_visits = (*visits as f32 * 256.0 / max_visits as f32) as u8;
                     writer.write_all(&scaled_visits.to_le_bytes())?;
                 }
             }
