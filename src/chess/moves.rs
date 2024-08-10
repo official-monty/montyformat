@@ -28,6 +28,10 @@ impl std::fmt::Display for Move {
 impl Move {
     pub const NULL: Move = Move { mov: 0 };
 
+    pub fn inner(&self) -> u16 {
+        self.mov
+    }
+
     pub fn src(&self) -> u16 {
         self.mov >> 10
     }

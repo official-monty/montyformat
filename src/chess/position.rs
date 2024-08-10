@@ -29,8 +29,6 @@ impl Position {
         }
     }
 
-    // ACCESSOR METHODS
-
     #[must_use]
     pub fn piece(&self, piece: usize) -> u64 {
         self.bb[piece]
