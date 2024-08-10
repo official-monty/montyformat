@@ -28,5 +28,14 @@ macro_rules! bitloop {
     };}
 }
 
+macro_rules! read_into_primitive {
+    ($reader:expr, $t:ty) => {{
+        let mut buf = [0u8; std::mem::size_of::<$t>()];
+        $reader.read_exact(&mut buf)?;
+        <$t>::from_le_bytes(buf)
+    }};
+}
+
 pub(crate) use init;
 pub(crate) use bitloop;
+pub(crate) use read_into_primitive;

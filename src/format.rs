@@ -1,6 +1,6 @@
 use std::io::{Error, ErrorKind, Write};
 
-use crate::chess::{Castling, Move, Position};
+use crate::{chess::{Castling, Move, Position}, read_into_primitive};
 
 pub struct SearchData {
     pub best_move: Move,
@@ -49,7 +49,6 @@ impl MontyFormat {
         self.moves.pop()
     }
 
-    #[must_use]
     pub fn serialise_into_buffer(&self, writer: &mut Vec<u8>) -> std::io::Result<()> {
         if !writer.is_empty() {
             return Err(Error::new(ErrorKind::Other, "Buffer is not empty!"));
@@ -99,6 +98,76 @@ impl MontyFormat {
 
         writer.write_all(&[0; 2])?;
         Ok(())
+    }
+
+    pub fn deserialise_from(reader: &mut impl std::io::BufRead) -> std::io::Result<Self> {
+        let mut bbs = [0u64; 4];
+        for bb in &mut bbs {
+            *bb = read_into_primitive!(reader, u64);
+
+        }
+
+        let stm = read_into_primitive!(reader, u8);
+        let enp_sq = read_into_primitive!(reader, u8);
+        let rights = read_into_primitive!(reader, u8);
+        let halfm = read_into_primitive!(reader, u8);
+        let fullm = read_into_primitive!(reader, u16);
+
+        let compressed = CompressedChessBoard { bbs, stm, enp_sq, rights, halfm, fullm };
+        let startpos = Position::from(compressed);
+
+        let mut rook_files = [[0; 2]; 2];
+        for side in &mut rook_files {
+            for rook in side {
+                *rook = read_into_primitive!(reader, u8);
+            }
+        }
+
+        let castling = Castling::from_raw(&startpos, rook_files);
+
+        let result = read_into_primitive!(reader, u8) as f32 / 2.0;
+
+        let mut moves = Vec::new();
+
+        let mut pos = startpos;
+
+        loop {
+            let best_move = Move::from(read_into_primitive!(reader, u16));
+
+            if best_move == Move::NULL {
+                break;
+            }
+
+            let score = f32::from(read_into_primitive!(reader, u16)) / f32::from(u16::MAX);
+
+            let num_moves = read_into_primitive!(reader, u8);
+
+            let visit_distribution = if num_moves == 0 {
+                None
+            } else {
+                let mut dist = Vec::with_capacity(usize::from(num_moves));
+
+                pos.map_legal_moves(&castling, |mov| dist.push((mov, 0)));
+                dist.sort_by_key(|(mov, _)| mov.inner());
+
+                for entry in &mut dist {
+                    entry.1 = u32::from(read_into_primitive!(reader, u8));
+                }
+
+                Some(dist)
+            };
+
+            moves.push(SearchData { best_move, score, visit_distribution });
+
+            pos.make(best_move, &castling);
+        }
+
+        Ok(MontyFormat {
+            startpos,
+            castling,
+            result,
+            moves,
+        })
     }
 }
 
