@@ -18,7 +18,7 @@ impl SearchData {
             .map(|x| x.iter().map(|&(mov, visits)| (mov.into(), visits)).collect());
 
         if let Some(dist) = visit_distribution.as_mut() {
-            dist.sort_by_key(|(mov, _)| mov.inner());
+            dist.sort_by_key(|(mov, _)| u16::from(*mov));
         }
 
         Self{
@@ -80,7 +80,7 @@ impl MontyFormat {
 
             let score = (data.score * f32::from(u16::MAX)) as u16;
 
-            writer.write_all(&data.best_move.inner().to_le_bytes())?;
+            writer.write_all(&u16::from(data.best_move).to_le_bytes())?;
             writer.write_all(&score.to_le_bytes())?;
 
             let num_moves = data.visit_distribution.as_ref().map(|dist| dist.len()).unwrap_or(0) as u8;
@@ -148,7 +148,7 @@ impl MontyFormat {
                 let mut dist = Vec::with_capacity(usize::from(num_moves));
 
                 pos.map_legal_moves(&castling, |mov| dist.push((mov, 0)));
-                dist.sort_by_key(|(mov, _)| mov.inner());
+                dist.sort_by_key(|(mov, _)| u16::from(*mov));
 
                 for entry in &mut dist {
                     entry.1 = u32::from(read_into_primitive!(reader, u8));
