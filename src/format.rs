@@ -152,7 +152,13 @@ impl MontyFormat {
                 pos.map_legal_moves(&castling, |mov| dist.push((mov, 0)));
                 dist.sort_by_key(|(mov, _)| u16::from(*mov));
 
-                assert_eq!(dist.len(), usize::from(num_moves));
+                assert_eq!(
+                    dist.len(),
+                    usize::from(num_moves),
+                    "{}\n{:?}",
+                    pos.as_fen(),
+                    castling.rook_files(),
+                );
 
                 for entry in &mut dist {
                     entry.1 = u32::from(read_into_primitive!(reader, u8));
