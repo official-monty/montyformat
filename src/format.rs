@@ -66,8 +66,10 @@ impl MontyFormat {
         writer.write_all(&compressed.halfm.to_le_bytes())?;
         writer.write_all(&compressed.fullm.to_le_bytes())?;
 
-        for rf in self.castling.rook_files().as_flattened() {
-            writer.write_all(&rf.to_le_bytes())?;
+        for side in self.castling.rook_files() {
+            for rook in side {
+                writer.write_all(&rook.to_le_bytes())?;
+            }
         }
 
         let result = (self.result * 2.0) as u8;
@@ -149,6 +151,8 @@ impl MontyFormat {
 
                 pos.map_legal_moves(&castling, |mov| dist.push((mov, 0)));
                 dist.sort_by_key(|(mov, _)| u16::from(*mov));
+
+                assert_eq!(dist.len(), usize::from(num_moves));
 
                 for entry in &mut dist {
                     entry.1 = u32::from(read_into_primitive!(reader, u8));
