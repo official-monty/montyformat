@@ -1,6 +1,6 @@
 use std::io::{Error, ErrorKind, Write};
 
-use crate::{chess::{Castling, Move, Position}, read_into_primitive};
+use crate::{chess::{Castling, Move, Position}, read_into_primitive, read_primitive_into_vec};
 
 pub struct SearchData {
     pub best_move: Move,
@@ -178,6 +178,46 @@ impl MontyFormat {
             result,
             moves,
         })
+    }
+
+    pub fn deserialise_fast_into_buffer(reader: &mut impl std::io::BufRead, buffer: &mut Vec<u8>) -> std::io::Result<()> {
+        buffer.clear();
+
+        for _ in 0..4 {
+            let _ = read_primitive_into_vec!(reader, buffer, u64);
+        }
+
+        let _ = read_primitive_into_vec!(reader, buffer, u8);
+        let _ = read_primitive_into_vec!(reader, buffer, u8);
+        let _ = read_primitive_into_vec!(reader, buffer, u8);
+        let _ = read_primitive_into_vec!(reader, buffer, u8);
+        let _ = read_primitive_into_vec!(reader, buffer, u16);
+
+        for _ in 0..4 {
+            let _ = read_primitive_into_vec!(reader, buffer, u8);
+        }
+
+        let _ = read_primitive_into_vec!(reader, buffer, u8);
+
+        loop {
+            let best_move = Move::from(read_primitive_into_vec!(reader, buffer, u16));
+
+            if best_move == Move::NULL {
+                break;
+            }
+
+            let _ = read_primitive_into_vec!(reader, buffer, u16);
+
+            let num_moves = read_primitive_into_vec!(reader, buffer, u8);
+
+            if num_moves > 0 {
+                for _ in 0..num_moves {
+                    let _ = read_primitive_into_vec!(reader, buffer, u8);
+                }
+            };
+        }
+
+        Ok(())
     }
 }
 
