@@ -1,4 +1,8 @@
-use crate::{chess::{Castling, Move, Position}, format::CompressedChessBoard, read_into_primitive, read_primitive_into_vec};
+use crate::{
+    chess::{Castling, Move, Position},
+    format::CompressedChessBoard,
+    read_into_primitive, read_primitive_into_vec,
+};
 
 pub struct SearchResult {
     pub best_move: Move,
@@ -61,7 +65,6 @@ impl MontyValueFormat {
         let mut bbs = [0u64; 4];
         for bb in &mut bbs {
             *bb = read_into_primitive!(reader, u64);
-
         }
 
         let stm = read_into_primitive!(reader, u8);
@@ -69,7 +72,14 @@ impl MontyValueFormat {
         let rights = read_into_primitive!(reader, u8);
         let halfm = read_into_primitive!(reader, u8);
 
-        let compressed = CompressedChessBoard { bbs, stm, enp_sq, rights, halfm, fullm: 0 };
+        let compressed = CompressedChessBoard {
+            bbs,
+            stm,
+            enp_sq,
+            rights,
+            halfm,
+            fullm: 0,
+        };
         let startpos = Position::from(compressed);
 
         let mut rook_files = [[0; 2]; 2];
@@ -97,7 +107,10 @@ impl MontyValueFormat {
             let best_move = u16::from_le_bytes([buf[0], buf[1]]);
             let score = i16::from_le_bytes([buf[2], buf[3]]);
 
-            moves.push(SearchResult { best_move: best_move.into(), score });
+            moves.push(SearchResult {
+                best_move: best_move.into(),
+                score,
+            });
         }
 
         Ok(Self {

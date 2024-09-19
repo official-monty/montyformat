@@ -1,4 +1,7 @@
-use std::{fs::File, io::{BufReader, BufWriter, Write}};
+use std::{
+    fs::File,
+    io::{BufReader, BufWriter, Write},
+};
 
 use montyformat::MontyFormat;
 
@@ -8,7 +11,8 @@ fn main() {
 
     let mut reusable_buffer = Vec::new();
 
-    while let Ok(()) = MontyFormat::deserialise_fast_into_buffer(&mut reader, &mut reusable_buffer) {
+    while let Ok(()) = MontyFormat::deserialise_fast_into_buffer(&mut reader, &mut reusable_buffer)
+    {
         writer.write_all(&reusable_buffer).unwrap();
     }
 }

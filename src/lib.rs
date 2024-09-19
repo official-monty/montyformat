@@ -27,7 +27,7 @@ macro_rules! bitloop {
 
             $func;
         }
-    };}
+    };};
 }
 
 macro_rules! read_primitive_into_vec {
@@ -47,8 +47,7 @@ macro_rules! read_into_primitive {
     }};
 }
 
-pub(crate) use init;
 pub(crate) use bitloop;
-pub(crate) use read_primitive_into_vec;
+pub(crate) use init;
 pub(crate) use read_into_primitive;
-
+pub(crate) use read_primitive_into_vec;
