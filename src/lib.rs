@@ -1,7 +1,9 @@
 pub mod chess;
 mod format;
+mod interleave;
 mod value;
 
+pub use interleave::FastDeserialise;
 pub use format::{MontyFormat, SearchData};
 pub use value::MontyValueFormat;
 

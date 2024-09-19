@@ -3,7 +3,7 @@ use std::{
     io::{BufReader, BufWriter, Write},
 };
 
-use montyformat::MontyFormat;
+use montyformat::{FastDeserialise, MontyFormat};
 
 fn main() {
     let mut reader = BufReader::new(File::open("../binpacks/policygen6.binpack").unwrap());

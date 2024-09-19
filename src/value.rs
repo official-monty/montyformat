@@ -1,7 +1,5 @@
 use crate::{
-    chess::{Castling, Move, Position},
-    format::CompressedChessBoard,
-    read_into_primitive, read_primitive_into_vec,
+    chess::{Castling, Move, Position}, format::CompressedChessBoard, interleave::{interleave, FastDeserialise}, read_into_primitive, read_primitive_into_vec
 };
 
 pub struct SearchResult {
@@ -122,7 +120,13 @@ impl MontyValueFormat {
         })
     }
 
-    pub fn deserialise_fast_into_buffer(
+    pub fn interleave(input_paths: &[String], output_path: &str, seed: u64) -> std::io::Result<()> {
+        interleave::<Self>(input_paths, output_path, seed)
+    }
+}
+
+impl FastDeserialise for MontyValueFormat {
+    fn deserialise_fast_into_buffer(
         reader: &mut impl std::io::BufRead,
         buffer: &mut Vec<u8>,
     ) -> std::io::Result<()> {
