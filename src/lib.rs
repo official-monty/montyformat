@@ -1,7 +1,9 @@
 pub mod chess;
 mod format;
+mod value;
 
 pub use format::{MontyFormat, SearchData};
+pub use value::MontyValueFormat;
 
 macro_rules! init {
     (|$sq:ident, $size:literal | $($rest:tt)+) => {{

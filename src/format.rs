@@ -223,12 +223,12 @@ impl MontyFormat {
 
 #[derive(Clone, Copy)]
 pub struct CompressedChessBoard {
-    bbs: [u64; 4],
-    stm: u8,
-    enp_sq: u8,
-    rights: u8,
-    halfm: u8,
-    fullm: u16,
+    pub bbs: [u64; 4],
+    pub stm: u8,
+    pub enp_sq: u8,
+    pub rights: u8,
+    pub halfm: u8,
+    pub fullm: u16,
 }
 
 impl From<Position> for CompressedChessBoard {
