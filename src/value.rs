@@ -1,5 +1,8 @@
 use crate::{
-    chess::{Castling, Move, Position}, format::CompressedChessBoard, interleave::{interleave, FastDeserialise}, read_into_primitive, read_primitive_into_vec
+    chess::{Castling, Move, Position},
+    format::CompressedChessBoard,
+    interleave::{interleave, FastDeserialise},
+    read_into_primitive, read_primitive_into_vec,
 };
 
 pub struct SearchResult {

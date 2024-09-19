@@ -15,10 +15,17 @@ impl RandU64 {
 }
 
 pub trait FastDeserialise {
-    fn deserialise_fast_into_buffer(reader: &mut impl std::io::BufRead, buffer: &mut Vec<u8>) -> std::io::Result<()>;
+    fn deserialise_fast_into_buffer(
+        reader: &mut impl std::io::BufRead,
+        buffer: &mut Vec<u8>,
+    ) -> std::io::Result<()>;
 }
 
-pub fn interleave<T: FastDeserialise>(input_paths: &[String], output_path: &str, seed: u64) -> std::io::Result<()> {    
+pub fn interleave<T: FastDeserialise>(
+    input_paths: &[String],
+    output_path: &str,
+    seed: u64,
+) -> std::io::Result<()> {
     println!("Writing to {:#?}", output_path);
     println!("Reading from:\n{:#?}", input_paths);
     let mut streams = Vec::new();
