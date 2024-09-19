@@ -1,6 +1,10 @@
 use std::io::{Error, ErrorKind, Write};
 
-use crate::{chess::{Castling, Move, Position}, read_into_primitive, read_primitive_into_vec};
+use crate::{
+    chess::{Castling, Move, Position},
+    interleave::{interleave, FastDeserialise},
+    read_into_primitive, read_primitive_into_vec,
+};
 
 pub struct SearchData {
     pub best_move: Move,
@@ -14,14 +18,17 @@ impl SearchData {
         score: f32,
         visit_distribution: Option<Vec<(T, u32)>>,
     ) -> Self {
-        let mut visit_distribution: Option<Vec<(Move, u32)>> = visit_distribution
-            .map(|x| x.iter().map(|&(mov, visits)| (mov.into(), visits)).collect());
+        let mut visit_distribution: Option<Vec<(Move, u32)>> = visit_distribution.map(|x| {
+            x.iter()
+                .map(|&(mov, visits)| (mov.into(), visits))
+                .collect()
+        });
 
         if let Some(dist) = visit_distribution.as_mut() {
             dist.sort_by_key(|(mov, _)| u16::from(*mov));
         }
 
-        Self{
+        Self {
             best_move: best_move.into(),
             score,
             visit_distribution,
@@ -38,7 +45,12 @@ pub struct MontyFormat {
 
 impl MontyFormat {
     pub fn new(startpos: Position, castling: Castling) -> Self {
-        Self { startpos, castling, result: 0.0, moves: Vec::new() }
+        Self {
+            startpos,
+            castling,
+            result: 0.0,
+            moves: Vec::new(),
+        }
     }
 
     pub fn push(&mut self, position_data: SearchData) {
@@ -77,7 +89,10 @@ impl MontyFormat {
 
         for data in &self.moves {
             if data.score.clamp(0.0, 1.0) != data.score {
-                return Err(Error::new(ErrorKind::InvalidData, "Score outside valid range!"));
+                return Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "Score outside valid range!",
+                ));
             }
 
             let score = (data.score * f32::from(u16::MAX)) as u16;
@@ -85,12 +100,20 @@ impl MontyFormat {
             writer.write_all(&u16::from(data.best_move).to_le_bytes())?;
             writer.write_all(&score.to_le_bytes())?;
 
-            let num_moves = data.visit_distribution.as_ref().map(|dist| dist.len()).unwrap_or(0) as u8;
+            let num_moves = data
+                .visit_distribution
+                .as_ref()
+                .map(|dist| dist.len())
+                .unwrap_or(0) as u8;
 
             writer.write_all(&num_moves.to_le_bytes())?;
 
             if let Some(dist) = data.visit_distribution.as_ref() {
-                let max_visits = dist.iter().max_by_key(|(_, visits)| visits).map(|x| x.1).unwrap_or(0);
+                let max_visits = dist
+                    .iter()
+                    .max_by_key(|(_, visits)| visits)
+                    .map(|x| x.1)
+                    .unwrap_or(0);
                 for (_, visits) in dist {
                     let scaled_visits = (*visits as f32 * 256.0 / max_visits as f32) as u8;
                     writer.write_all(&scaled_visits.to_le_bytes())?;
@@ -106,7 +129,6 @@ impl MontyFormat {
         let mut bbs = [0u64; 4];
         for bb in &mut bbs {
             *bb = read_into_primitive!(reader, u64);
-
         }
 
         let stm = read_into_primitive!(reader, u8);
@@ -115,7 +137,14 @@ impl MontyFormat {
         let halfm = read_into_primitive!(reader, u8);
         let fullm = read_into_primitive!(reader, u16);
 
-        let compressed = CompressedChessBoard { bbs, stm, enp_sq, rights, halfm, fullm };
+        let compressed = CompressedChessBoard {
+            bbs,
+            stm,
+            enp_sq,
+            rights,
+            halfm,
+            fullm,
+        };
         let startpos = Position::from(compressed);
 
         let mut rook_files = [[0; 2]; 2];
@@ -167,7 +196,11 @@ impl MontyFormat {
                 Some(dist)
             };
 
-            moves.push(SearchData { best_move, score, visit_distribution });
+            moves.push(SearchData {
+                best_move,
+                score,
+                visit_distribution,
+            });
 
             pos.make(best_move, &castling);
         }
@@ -180,7 +213,16 @@ impl MontyFormat {
         })
     }
 
-    pub fn deserialise_fast_into_buffer(reader: &mut impl std::io::BufRead, buffer: &mut Vec<u8>) -> std::io::Result<()> {
+    pub fn interleave(input_paths: &[String], output_path: &str, seed: u64) -> std::io::Result<()> {
+        interleave::<Self>(input_paths, output_path, seed)
+    }
+}
+
+impl FastDeserialise for MontyFormat {
+    fn deserialise_fast_into_buffer(
+        reader: &mut impl std::io::BufRead,
+        buffer: &mut Vec<u8>,
+    ) -> std::io::Result<()> {
         buffer.clear();
 
         for _ in 0..4 {
@@ -223,12 +265,12 @@ impl MontyFormat {
 
 #[derive(Clone, Copy)]
 pub struct CompressedChessBoard {
-    bbs: [u64; 4],
-    stm: u8,
-    enp_sq: u8,
-    rights: u8,
-    halfm: u8,
-    fullm: u16,
+    pub bbs: [u64; 4],
+    pub stm: u8,
+    pub enp_sq: u8,
+    pub rights: u8,
+    pub halfm: u8,
+    pub fullm: u16,
 }
 
 impl From<Position> for CompressedChessBoard {
@@ -276,6 +318,13 @@ impl From<CompressedChessBoard> for Position {
         bbs[6] = pbq & prq & rqk;
         bbs[7] = nbk & rqk;
 
-        Position::from_raw(bbs, value.stm > 0, value.enp_sq, value.rights, value.halfm, value.fullm)
+        Position::from_raw(
+            bbs,
+            value.stm > 0,
+            value.enp_sq,
+            value.rights,
+            value.halfm,
+            value.fullm,
+        )
     }
 }

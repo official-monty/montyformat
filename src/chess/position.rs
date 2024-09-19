@@ -18,7 +18,14 @@ pub struct Position {
 }
 
 impl Position {
-    pub fn from_raw(bb: [u64; 8], stm: bool, enp_sq: u8, rights: u8, halfm: u8, fullm: u16) -> Self {
+    pub fn from_raw(
+        bb: [u64; 8],
+        stm: bool,
+        enp_sq: u8,
+        rights: u8,
+        halfm: u8,
+        fullm: u16,
+    ) -> Self {
         Self {
             bb,
             stm,
@@ -92,7 +99,6 @@ impl Position {
         let king = (self.piece(Piece::KING) & self.boys()).trailing_zeros();
         self.is_square_attacked(king as usize, self.stm(), self.occ())
     }
-
 
     #[must_use]
     pub fn attackers_to_square(&self, sq: usize, side: usize, occ: u64) -> u64 {

@@ -1,7 +1,11 @@
 pub mod chess;
 mod format;
+mod interleave;
+mod value;
 
 pub use format::{MontyFormat, SearchData};
+pub use interleave::FastDeserialise;
+pub use value::MontyValueFormat;
 
 macro_rules! init {
     (|$sq:ident, $size:literal | $($rest:tt)+) => {{
@@ -25,7 +29,7 @@ macro_rules! bitloop {
 
             $func;
         }
-    };}
+    };};
 }
 
 macro_rules! read_primitive_into_vec {
@@ -45,8 +49,7 @@ macro_rules! read_into_primitive {
     }};
 }
 
-pub(crate) use init;
 pub(crate) use bitloop;
-pub(crate) use read_primitive_into_vec;
+pub(crate) use init;
 pub(crate) use read_into_primitive;
-
+pub(crate) use read_primitive_into_vec;
