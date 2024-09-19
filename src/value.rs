@@ -80,6 +80,7 @@ impl MontyValueFormat {
             halfm,
             fullm: 0,
         };
+
         let startpos = Position::from(compressed);
 
         let mut rook_files = [[0; 2]; 2];
