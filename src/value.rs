@@ -61,6 +61,7 @@ impl MontyValueFormat {
 
     pub fn deserialise_from(
         reader: &mut impl std::io::BufRead,
+        contains_fullmove_counter: bool,
         buffer: Vec<SearchResult>,
     ) -> std::io::Result<Self> {
         let mut bbs = [0u64; 4];
@@ -72,6 +73,11 @@ impl MontyValueFormat {
         let enp_sq = read_into_primitive!(reader, u8);
         let rights = read_into_primitive!(reader, u8);
         let halfm = read_into_primitive!(reader, u8);
+        let fullm = if contains_fullmove_counter {
+            read_into_primitive!(reader, u16)
+        } else {
+            0
+        };
 
         let compressed = CompressedChessBoard {
             bbs,
@@ -79,7 +85,7 @@ impl MontyValueFormat {
             enp_sq,
             rights,
             halfm,
-            fullm: 0,
+            fullm,
         };
 
         let startpos = Position::from(compressed);
