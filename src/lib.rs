@@ -5,7 +5,7 @@ mod value;
 
 pub use format::{MontyFormat, SearchData};
 pub use interleave::FastDeserialise;
-pub use value::MontyValueFormat;
+pub use value::{MontyValueFormat, SearchResult};
 
 macro_rules! init {
     (|$sq:ident, $size:literal | $($rest:tt)+) => {{
