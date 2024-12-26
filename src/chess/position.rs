@@ -185,6 +185,7 @@ impl Position {
         self.enp_sq = 0;
         self.rights &= castling.mask(usize::from(mov.to())) & castling.mask(usize::from(mov.src()));
         self.halfm += 1;
+        self.fullm += u16::from(side == Side::BLACK);
 
         if moved == Piece::PAWN || mov.is_capture() {
             self.halfm = 0;
@@ -604,7 +605,7 @@ impl Position {
             }
         }
 
-        fen.push_str(" - 0 1");
+        fen.push_str(&format!(" - {} {}", self.halfm(), self.fullm()));
 
         fen
     }
