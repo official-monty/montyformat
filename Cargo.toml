@@ -1,8 +1,11 @@
 [package]
 name = "montyformat"
-version = "0.7.0"
+version = "0.8.0"
 edition = "2021"
 authors = ["Jamie Whiting"]
+description = "Compressed data formats for Monty"
+license = "MIT"
+readme = "README.md"
 
 [profile.release]
 panic = 'abort'
