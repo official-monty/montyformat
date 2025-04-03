@@ -5,7 +5,6 @@ edition = "2021"
 authors = ["Jamie Whiting"]
 description = "Compressed data formats for Monty"
 license = "MIT"
-readme = "README.md"
 
 [profile.release]
 panic = 'abort'
