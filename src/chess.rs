@@ -1,5 +1,5 @@
 mod attacks;
-mod consts;
+pub mod consts;
 mod frc;
 mod moves;
 mod position;
