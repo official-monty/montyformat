@@ -1,10 +1,10 @@
 [package]
 name = "montyformat"
-version = "0.9.0"
+version = "0.9.1"
 edition = "2021"
 authors = ["Jamie Whiting"]
 description = "Compressed data formats for Monty"
-license = "MIT"
+license = "AGPL-3.0"
 
 [profile.release]
 panic = 'abort'
