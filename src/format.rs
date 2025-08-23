@@ -115,7 +115,7 @@ impl MontyFormat {
                     .map(|x| x.1)
                     .unwrap_or(0);
                 for (_, visits) in dist {
-                    let scaled_visits = (*visits as f32 * 256.0 / max_visits as f32) as u8;
+                    let scaled_visits = (*visits as f32 * 255.0 / max_visits as f32).round() as u8;
                     writer.write_all(&scaled_visits.to_le_bytes())?;
                 }
             }
